@@ -98,8 +98,8 @@ def create_tables():
 
     return "Tables créées ✅"
 
-@app.route("/migrate-data")
-def migrate_data():
+@app.route("/migrate-produits")
+def migrate_produits():
 
     import sqlite3
 
@@ -109,37 +109,24 @@ def migrate_data():
     pg_conn = get_db_connection()
     pg_cursor = pg_conn.cursor()
 
-    tables = [
-        "users",
-        "rayons",
-        "produits",
-        "services",
-        "service_alias",
-        "recherches_introuvables"
-    ]
+    sqlite_cursor.execute("SELECT * FROM produits LIMIT 500")
+    rows = sqlite_cursor.fetchall()
 
-    for table in tables:
-
-        sqlite_cursor.execute(f"SELECT * FROM {table}")
-        rows = sqlite_cursor.fetchall()
-
-        if not rows:
-            continue
-
-        placeholders = ",".join(["%s"] * len(rows[0]))
-
-        for row in rows:
-            pg_cursor.execute(
-                f"INSERT INTO {table} VALUES ({placeholders})",
-                row
-            )
+    for row in rows:
+        pg_cursor.execute(
+            """
+            INSERT INTO produits (id, nom, rayon_id, date_ajout)
+            VALUES (%s, %s, %s, %s)
+            """,
+            row
+        )
 
     pg_conn.commit()
 
     sqlite_conn.close()
     pg_conn.close()
 
-    return "Migration terminée ✅"
+    return "500 produits migrés ✅"
 
 
 @app.route("/")
