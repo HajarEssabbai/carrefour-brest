@@ -262,6 +262,47 @@ def migrate_alias():
 
     except Exception as e:
         return str(e)
+
+@app.route("/migrate-users")
+def migrate_users():
+
+    try:
+
+        import sqlite3
+        from psycopg2.extras import execute_values
+
+        sqlite_conn = sqlite3.connect("database.db")
+        sqlite_cursor = sqlite_conn.cursor()
+
+        pg_conn = get_db_connection()
+        pg_cursor = pg_conn.cursor()
+
+        sqlite_cursor.execute("""
+            SELECT id, username, password
+            FROM users
+        """)
+
+        rows = sqlite_cursor.fetchall()
+
+        execute_values(
+            pg_cursor,
+            """
+            INSERT INTO users (id, username, password)
+            VALUES %s
+            ON CONFLICT (id) DO NOTHING
+            """,
+            rows
+        )
+
+        pg_conn.commit()
+
+        sqlite_conn.close()
+        pg_conn.close()
+
+        return f"{len(rows)} users migrés ✅"
+
+    except Exception as e:
+        return str(e) 
     
 @app.route("/")
 @login_required
