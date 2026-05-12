@@ -125,6 +125,7 @@ def migrate_produits():
             """
             INSERT INTO produits (id, nom, rayon_id, date_ajout)
             VALUES %s
+            ON CONFLICT (id) DO NOTHING
             """,
             rows
         )
@@ -165,6 +166,7 @@ def migrate_rayons():
             """
             INSERT INTO rayons (id, nom, numero_allee)
             VALUES %s
+            ON CONFLICT (id) DO NOTHING
             """,
             rows
         )
@@ -175,6 +177,47 @@ def migrate_rayons():
         pg_conn.close()
 
         return f"{len(rows)} rayons migrés ✅"
+
+    except Exception as e:
+        return str(e)
+    
+@app.route("/migrate-services")
+def migrate_services():
+
+    try:
+
+        import sqlite3
+        from psycopg2.extras import execute_values
+
+        sqlite_conn = sqlite3.connect("database.db")
+        sqlite_cursor = sqlite_conn.cursor()
+
+        pg_conn = get_db_connection()
+        pg_cursor = pg_conn.cursor()
+
+        sqlite_cursor.execute("""
+            SELECT id, nom, rayon_id
+            FROM services
+        """)
+
+        rows = sqlite_cursor.fetchall()
+
+        execute_values(
+            pg_cursor,
+            """
+            INSERT INTO services (id, nom, rayon_id)
+            VALUES %s
+            ON CONFLICT (id) DO NOTHING
+            """,
+            rows
+        )
+
+        pg_conn.commit()
+
+        sqlite_conn.close()
+        pg_conn.close()
+
+        return f"{len(rows)} services migrés ✅"
 
     except Exception as e:
         return str(e)
