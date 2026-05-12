@@ -98,6 +98,50 @@ def create_tables():
 
     return "Tables créées ✅"
 
+@app.route("/migrate-data")
+def migrate_data():
+
+    import sqlite3
+
+    sqlite_conn = sqlite3.connect("database.db")
+    sqlite_cursor = sqlite_conn.cursor()
+
+    pg_conn = get_db_connection()
+    pg_cursor = pg_conn.cursor()
+
+    tables = [
+        "users",
+        "rayons",
+        "produits",
+        "services",
+        "service_alias",
+        "recherches_introuvables"
+    ]
+
+    for table in tables:
+
+        sqlite_cursor.execute(f"SELECT * FROM {table}")
+        rows = sqlite_cursor.fetchall()
+
+        if not rows:
+            continue
+
+        placeholders = ",".join(["%s"] * len(rows[0]))
+
+        for row in rows:
+            pg_cursor.execute(
+                f"INSERT INTO {table} VALUES ({placeholders})",
+                row
+            )
+
+    pg_conn.commit()
+
+    sqlite_conn.close()
+    pg_conn.close()
+
+    return "Migration terminée ✅"
+
+
 @app.route("/")
 @login_required
 def accueil():
