@@ -139,6 +139,46 @@ def migrate_produits():
     except Exception as e:
         return str(e)
 
+@app.route("/migrate-rayons")
+def migrate_rayons():
+
+    try:
+
+        import sqlite3
+        from psycopg2.extras import execute_values
+
+        sqlite_conn = sqlite3.connect("database.db")
+        sqlite_cursor = sqlite_conn.cursor()
+
+        pg_conn = get_db_connection()
+        pg_cursor = pg_conn.cursor()
+
+        sqlite_cursor.execute("""
+            SELECT id, nom, numero_allee
+            FROM rayons
+        """)
+
+        rows = sqlite_cursor.fetchall()
+
+        execute_values(
+            pg_cursor,
+            """
+            INSERT INTO rayons (id, nom, numero_allee)
+            VALUES %s
+            """,
+            rows
+        )
+
+        pg_conn.commit()
+
+        sqlite_conn.close()
+        pg_conn.close()
+
+        return f"{len(rows)} rayons migrés ✅"
+
+    except Exception as e:
+        return str(e)
+    
 @app.route("/")
 @login_required
 def accueil():
