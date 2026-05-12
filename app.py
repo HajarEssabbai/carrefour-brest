@@ -304,6 +304,47 @@ def migrate_users():
     except Exception as e:
         return str(e) 
     
+@app.route("/migrate-recherches")
+def migrate_recherches():
+
+    try:
+
+        import sqlite3
+        from psycopg2.extras import execute_values
+
+        sqlite_conn = sqlite3.connect("database.db")
+        sqlite_cursor = sqlite_conn.cursor()
+
+        pg_conn = get_db_connection()
+        pg_cursor = pg_conn.cursor()
+
+        sqlite_cursor.execute("""
+            SELECT id, recherche, date_recherche
+            FROM recherches_introuvables
+        """)
+
+        rows = sqlite_cursor.fetchall()
+
+        execute_values(
+            pg_cursor,
+            """
+            INSERT INTO recherches_introuvables (id, recherche, date_recherche)
+            VALUES %s
+            ON CONFLICT (id) DO NOTHING
+            """,
+            rows
+        )
+
+        pg_conn.commit()
+
+        sqlite_conn.close()
+        pg_conn.close()
+
+        return f"{len(rows)} recherches migrés ✅"
+
+    except Exception as e:
+        return str(e) 
+    
 @app.route("/")
 @login_required
 def accueil():
