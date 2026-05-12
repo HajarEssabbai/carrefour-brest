@@ -1,0 +1,39 @@
+{% extends "base_client.html" %} 
+{% block content %}
+<div class="loading-page" id="loadingPage">
+
+    <img
+    src="{{ url_for('static', filename='hermine_AI.png') }}"
+    class="hermine"
+    id="hermine"
+    >
+
+    <p class="loading-text">
+    Localisation de votre produit…
+    </p>
+
+</div>
+
+<script>
+window.onload = function(){
+
+    setTimeout(function(){
+
+        // stop pulse + start spin
+        const hermine = document.getElementById("hermine");
+        hermine.classList.add("spin");
+
+        // fade out page
+        document.getElementById("loadingPage").classList.add("fade-out");
+
+        // redirection après animation
+        setTimeout(function(){
+            window.location.replace("{{ url_plan }}");
+        }, 800);
+
+    }, 2200);
+
+}
+</script>
+
+ {% endblock %}

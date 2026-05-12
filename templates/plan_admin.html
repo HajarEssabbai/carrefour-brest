@@ -1,0 +1,23 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<div class="plan-page fade-in">
+
+<h2 class="plan-title">
+Localisation du produit :
+</h2>
+
+<a href="/recherche" class="retour-link">
+Rechercher un autre produit</a>
+
+<img
+src="{{ url_for('static', filename=gif) }}"
+class="plan-image"
+>
+
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<div class="admin-page">
+
+<div class="admin-header">
+<h2>Liste des rayons</h2>
+</div>
+
+<div class="table-card">
+<div class="table-wrapper">
+
+<table class="produits-table"  border="1">
+    <tr>
+        <th>Nom</th>
+        <th>Numéro d’allée</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for rayon in rayons %}
+    <tr>
+        <td>{{ rayon[1] }}</td>
+        <td>{{ rayon[2] }}</td>
+        <td>
+            <a href="/modifier-rayon/{{ rayon[0] }}">Modifier</a> |
+            <a href="/supprimer-rayon/{{ rayon[0] }}" onclick="return confirm('Supprimer ce rayon ?')">
+            Supprimer </a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+</div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <div class="admin-header">
+        <h2>
+            📊 Recherches non trouvées
+        </h2>
+    </div>
+
+    <div class="table-card">
+
+        <div class="table-wrapper">
+
+            <table class="produits-table">
+
+                <tr>
+                    <th>Classement</th>
+                    <th>Identifiant</th>
+                    <th>Recherche</th>
+                    <th>Nb de recherches</th>
+                    <th>Dernière recherche</th>
+                    <th>Action</th>
+                </tr>
+
+                {% for recherche in recherches %}
+
+                <tr>
+
+                    <td>
+                        {{ loop.index }}
+                    </td>
+
+                    <td>
+                        {{ recherche[0] }}
+                    </td>
+
+                    <td>
+                        {{ recherche[1] }}
+                    </td>
+
+                    <td>
+                        {{ recherche[2] }}
+                    </td>
+
+                    <td>
+                        {{ recherche[3] }}
+                    </td>
+
+                    <td>
+
+                        <a
+                        href="/ajouter-produit?nom={{ recherche[1] }}"
+                        class="action-btn">
+                            Ajouter
+                        </a>
+
+                        <a
+                        href="/supprimer-recherche/{{ recherche[1] }}"
+                        onclick="return confirm('Supprimer cette recherche ?')"
+                        class="action-btn">
+                        Supprimer
+                        </a>
+
+                    </td>
+
+                    
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<div class="dashboard">
+
+<h1>
+Bienvenue dans l’espace administration
+</h1>
+
+<p class="dashboard-sub">
+Gestion des rayons et des produits Carrefour
+</p>
+
+
+<div class="dashboard-cards">
+
+<a href="/ajouter-rayon" class="admin-card">
+📍 Ajouter rayon
+</a>
+
+<a href="/rayons" class="admin-card">
+🗂 Voir rayons
+</a>
+
+<a href="/ajouter-produit" class="admin-card">
+➕ Ajouter produit
+</a>
+
+<a href="/produits" class="admin-card">
+📦 Voir produits
+</a>
+
+<a href="/recherche" class="admin-card">
+🔎 Tester recherche
+</a>
+
+<a href="/recherches" class="admin-card">
+📊 Recherches fréquentes
+</a>
+</div>
+
+</div>
+{% endblock %}

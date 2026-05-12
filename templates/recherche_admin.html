@@ -1,0 +1,166 @@
+{% extends "base_admin.html" %} 
+{% block content %}
+
+<div class="page-container">
+
+    <div class="search-page"> 
+
+        <!-- 🔵 BOX RECHERCHE (SEULEMENT LE FORMULAIRE) -->
+        <div class="search-box"> 
+            <div class="welcome-banner">
+                <div class="welcome-track">
+                    Bienvenue dans votre magasin Carrefour Brest •
+                    Welcome to your Carrefour store •
+                    Degemer mat e Carrefour Brest 
+                </div>
+            </div>
+           <h1 class="title">
+            <span class="icon-container">
+                 🛒
+                 <img 
+                 src="{{ url_for('static', filename='Drapeau-Bretagne_120-gif.gif') }}" 
+                 class="flag"
+                 > 
+            </span>
+
+            <span class="brest-label">
+                Hypermarché Brest
+            </span>
+          </h1>
+            <p class="subtitle">
+                Localisez un produit dans son rayon
+            </p> 
+
+            <form method="POST" class="search-form">
+
+                <div class="search-row">
+                    <input
+                    type="text"
+                    name="nom"
+                    placeholder="Touvrez un produit (Pain, œufs, lait...)""
+                    required
+                    >
+
+                    <img
+                    src="{{ url_for('static',
+                    filename='chapeau-removebg-preview.png') }}"
+                    class="breton-hat"
+                    alt=""
+                    >
+                </div>
+
+                <button type="submit">
+                    Rechercher
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- 🔴 RESULTATS (EN DEHORS DE LA BOX) -->
+         {% if rayons %}
+
+<div class="results-box">
+
+    {% if nb_rayons == 1 %}
+    <h3 class="result-title">
+        Produit trouvé dans ce rayon
+    </h3>
+    {% else %}
+    <h3 class="result-title">
+        Produit trouvé dans plusieurs rayons
+    </h3>
+
+    <p class="result-subtitle">
+        Sélectionnez un emplacement :
+    </p>
+    {% endif %}
+
+    {% for rayon_id, rayon in rayons.items() %}
+
+    <div class="rayon-card">
+
+        <h2 class="rayon-title">
+            {{ rayon["nom"] }}
+        </h2>
+
+        <a class="rayon-btn"
+           href="/loading/{{ rayon_id }}">
+           Localiser ce rayon
+        </a>
+
+        <p class="mini-label">
+            Produits correspondants :
+        </p>
+
+        <ul class="liste-produits">
+        {% for produit in rayon["produits"] %}
+            <li>
+                {{ produit }}
+
+                <a
+                href="https://www.carrefour.fr/s?q={{ produit|replace(' ','+') }}"
+                target="_blank"
+                class="prix-link">
+                    Voir prix/ infos
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+        {% if services %}
+
+<div class="results-box">
+
+    <h3 class="result-title">
+        Service trouvé
+    </h3>
+
+    {% for service_id, service in services.items() %}
+
+    <div class="rayon-card">
+
+        <h2 class="rayon-title">
+            {{ service["nom"] }}
+        </h2>
+
+        <a
+        class="rayon-btn"
+        href="/loading/{{ service["rayon_id"] }}">
+        Localiser ce service
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+{% if not rayons and not services and request.method == "POST" %}
+
+<p class="not-found">
+    Produit ou service introuvable ❌
+</p>
+
+{% endif %}
+
+    </div>
+
+
+
+    
+
+</div>
+
+{% endblock %}

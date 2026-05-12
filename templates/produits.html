@@ -1,0 +1,62 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<div class="admin-form-page">
+<div class="filtre-card">
+
+<h3 clas="filtre-title">
+    📦Produits par rayon
+</h3>
+
+<form method="POST" class="filtre-form">
+
+  <div class="filtre-field">
+    <label>Choisir un rayon :</label>
+    <select name="rayon_id">
+        {% for rayon in rayons %}
+            <option value="{{ rayon[0] }}"
+                {% if rayon_selectionne == rayon[0]|string %}selected{% endif %}>
+                {{ rayon[1] }}
+            </option>
+        {% endfor %}
+    </select>
+  </div>
+
+    <button type="submit" class="filtre-btn">
+        Afficher
+    </button>
+</form>
+</div>
+</div>
+
+{% if produits %}
+<div class="table-card">
+
+<table class="produits-table" border="1">
+    <tr>
+        <th>Nom</th>
+       
+        <th>Date</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for produit in produits %}
+    <tr>
+        <td>{{ produit[1] }}</td>
+        <td>{{ produit[2] }}</td>
+        <td>
+            <a href="/modifier-produit/{{ produit[0] }}">Modifier</a> |
+            <a href="/supprimer-produit/{{ produit[0] }}/{{ rayon_selectionne }}"
+               onclick="return confirm('Supprimer ce produit ?')">
+               Supprimer
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+</div>
+</div>
+{% endif %}
+
+{% endblock %}

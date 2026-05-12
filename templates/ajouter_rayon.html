@@ -1,0 +1,38 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<div class="admin-form-page">
+
+<div class="admin-form-card">
+
+<h2>Ajouter un rayon</h2>
+
+<p class="form-subtitle">
+Créer un nouveau rayon dans le magasin
+</p>
+
+<form method="POST">
+
+<label>
+Nom du rayon
+</label>
+
+<input
+type="text"
+name="nom"
+placeholder="Ex: Parfumerie"
+required
+>
+
+<button type="submit">
+Ajouter le rayon
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

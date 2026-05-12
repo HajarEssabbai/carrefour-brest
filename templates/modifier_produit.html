@@ -1,0 +1,50 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <div class="form-card">
+
+        <h2 class="form-title">
+            ✏️ Modifier le produit
+        </h2>
+
+        <p class="form-subtitle">
+            Modifier les informations du produit
+        </p>
+
+        <form method="POST" class="admin-form">
+
+            <div class="form-group">
+                <label>Nom du produit</label>
+                <input 
+                type="text" 
+                name="nom" 
+                value="{{ produit[0] }}" 
+                required>
+            </div>
+
+            <div class="form-group">
+                <label>Rayon</label>
+                <select name="rayon_id">
+                    {% for rayon in rayons %}
+                        <option value="{{ rayon[0] }}"
+                            {% if rayon[0] == produit[3] %}selected{% endif %}>
+                            {{ rayon[1] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="admin-btn">
+                Modifier le produit
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

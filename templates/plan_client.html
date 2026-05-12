@@ -1,0 +1,26 @@
+{% extends "base_client.html" %}
+
+{% block content %}
+<div class="page-container">
+<div class="plan-page fade-in">
+
+<h2 class="plan-title">
+Localisation du produit :
+</h2>
+
+<a href="/recherche" class="retour-link">
+Rechercher un autre produit
+</a>
+
+<img
+src="{{ url_for('static', filename=gif) }}"
+class="plan-image"
+>
+
+</div>
+
+<footer class="client-footer">
+© 2026 — Hypermarché Carrefour Brest
+</footer>
+</div>
+{% endblock %}
