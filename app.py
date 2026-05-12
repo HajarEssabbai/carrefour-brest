@@ -25,6 +25,7 @@ def get_db_connection():
         port="5432"
     )
 
+
 def login_required(f):
 
     @wraps(f)
@@ -37,6 +38,65 @@ def login_required(f):
 
     return decorated
 
+@app.route("/create-tables")
+def create_tables():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username TEXT UNIQUE,
+            password TEXT
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS rayons (
+            id SERIAL PRIMARY KEY,
+            nom TEXT NOT NULL,
+            numero_allee INTEGER NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS produits (
+            id SERIAL PRIMARY KEY,
+            nom TEXT NOT NULL,
+            rayon_id INTEGER,
+            date_ajout TEXT
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS services (
+            id SERIAL PRIMARY KEY,
+            nom TEXT NOT NULL,
+            rayon_id INTEGER
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS service_alias (
+            id SERIAL PRIMARY KEY,
+            service_id INTEGER,
+            alias TEXT NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS recherches_introuvables (
+            id SERIAL PRIMARY KEY,
+            recherche TEXT NOT NULL,
+            date_recherche TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+    return "Tables créées ✅"
 
 @app.route("/")
 @login_required
