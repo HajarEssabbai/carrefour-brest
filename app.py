@@ -102,37 +102,42 @@ def create_tables():
 @app.route("/migrate-produits")
 def migrate_produits():
 
-    import sqlite3
-    from psycopg2.extras import execute_values
+    try:
 
-    sqlite_conn = sqlite3.connect("database.db")
-    sqlite_cursor = sqlite_conn.cursor()
+        import sqlite3
+        from psycopg2.extras import execute_values
 
-    pg_conn = get_db_connection()
-    pg_cursor = pg_conn.cursor()
+        sqlite_conn = sqlite3.connect("database.db")
+        sqlite_cursor = sqlite_conn.cursor()
 
-    sqlite_cursor.execute("""
-        SELECT id, nom, rayon_id, date_ajout
-        FROM produits
-    """)
+        pg_conn = get_db_connection()
+        pg_cursor = pg_conn.cursor()
 
-    rows = sqlite_cursor.fetchall()
+        sqlite_cursor.execute("""
+            SELECT id, nom, rayon_id, date_ajout
+            FROM produits
+        """)
 
-    execute_values(
-        pg_cursor,
-        """
-        INSERT INTO produits (id, nom, rayon_id, date_ajout)
-        VALUES %s
-        """,
-        rows
-    )
+        rows = sqlite_cursor.fetchall()
 
-    pg_conn.commit()
+        execute_values(
+            pg_cursor,
+            """
+            INSERT INTO produits (id, nom, rayon_id, date_ajout)
+            VALUES %s
+            """,
+            rows
+        )
 
-    sqlite_conn.close()
-    pg_conn.close()
+        pg_conn.commit()
 
-    return f"{len(rows)} produits migrés ✅"
+        sqlite_conn.close()
+        pg_conn.close()
+
+        return f"{len(rows)} produits migrés ✅"
+
+    except Exception as e:
+        return str(e)
 
 @app.route("/")
 @login_required
