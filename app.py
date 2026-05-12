@@ -1,14 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import difflib
-import sqlite3
 import unicodedata
 import psycopg2
+import os
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = "secret123"
+
+def get_db_connection():
+
+    database_url = os.environ.get("DATABASE_URL")
+
+    if database_url:
+        return psycopg2.connect(database_url)
+
+    return psycopg2.connect(
+        host="localhost",
+        database="carrefour_brest",
+        user="postgres",
+        password="postgresql123",
+        port="5432"
+    )
 
 def login_required(f):
 
@@ -39,13 +54,7 @@ def login():
         username=request.form["username"]
         password=request.form["password"]
 
-        conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+        conn = get_db_connection()
         cursor=conn.cursor()
 
         cursor.execute(
@@ -102,13 +111,7 @@ def ajouter_rayon():
             return "Le nom du rayon ne peut pas être vide !"
         
         # Connexion à la base
-        conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # Vérifier si le rayon existe déjà
@@ -149,13 +152,7 @@ def ajouter_rayon():
 @login_required
 def afficher_rayons():
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT id, nom, numero_allee FROM rayons")
@@ -169,13 +166,7 @@ def afficher_rayons():
 @login_required
 def supprimer_rayon(id):
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM rayons WHERE id = %s", (id,))
@@ -191,13 +182,7 @@ def supprimer_rayon(id):
 @login_required
 def modifier_rayon(id):
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -242,13 +227,7 @@ def modifier_rayon(id):
 @login_required
 def ajouter_produit():
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -311,13 +290,7 @@ def ajouter_produit():
 @login_required
 def afficher_produits():
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # récupérer tous les rayons (pour dropdown)
@@ -358,13 +331,8 @@ def afficher_produits():
 @app.route("/supprimer-produit/<int:id>/<int:rayon_id>")
 @login_required
 def supprimer_produit(id, rayon_id):
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("DELETE FROM produits WHERE id = %s", (id,))
@@ -388,13 +356,7 @@ def enlever_accents(texte):
 @app.route("/recherche", methods=["GET", "POST"])
 def recherche():
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     rayons = {}
@@ -497,13 +459,7 @@ def recherche():
 @login_required
 def modifier_produit(id):
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -582,13 +538,7 @@ def loading(rayon_id):
 @login_required
 def recherches_introuvables():
     
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -618,13 +568,7 @@ def recherches_introuvables():
 @login_required
 def supprimer_recherche(recherche):
 
-    conn = psycopg2.connect(
-            host="localhost",
-            database="carrefour_brest",
-            user="postgres",
-            password="postgresql123",
-            port="5432"
-            )
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
