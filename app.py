@@ -6,6 +6,7 @@ import os
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from functools import wraps
+from psycopg2.extras import execute_values
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -102,6 +103,7 @@ def create_tables():
 def migrate_produits():
 
     import sqlite3
+    from psycopg2.extras import execute_values
 
     sqlite_conn = sqlite3.connect("database.db")
     sqlite_cursor = sqlite_conn.cursor()
@@ -109,25 +111,28 @@ def migrate_produits():
     pg_conn = get_db_connection()
     pg_cursor = pg_conn.cursor()
 
-    sqlite_cursor.execute("SELECT * FROM produits LIMIT 500")
+    sqlite_cursor.execute("""
+        SELECT id, nom, rayon_id, date_ajout
+        FROM produits
+    """)
+
     rows = sqlite_cursor.fetchall()
 
-    for row in rows:
-        pg_cursor.execute(
-            """
-            INSERT INTO produits (id, nom, rayon_id, date_ajout)
-            VALUES (%s, %s, %s, %s)
-            """,
-            row
-        )
+    execute_values(
+        pg_cursor,
+        """
+        INSERT INTO produits (id, nom, rayon_id, date_ajout)
+        VALUES %s
+        """,
+        rows
+    )
 
     pg_conn.commit()
 
     sqlite_conn.close()
     pg_conn.close()
 
-    return "500 produits migrés ✅"
-
+    return f"{len(rows)} produits migrés ✅"
 
 @app.route("/")
 @login_required
