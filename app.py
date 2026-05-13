@@ -841,6 +841,24 @@ def loading(rayon_id):
         url_plan=f"/plan/{rayon_id}"
     )
 
+@app.route("/fix-date-column")
+def fix_date_column():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        ALTER TABLE recherches_introuvables
+        ALTER COLUMN date_recherche
+        TYPE TIMESTAMP
+        USING date_recherche::timestamp
+    """)
+
+    conn.commit()
+    conn.close()
+
+    return "Colonne corrigée ✅"
+
 @app.route("/recherches")
 @login_required
 def recherches_introuvables():
@@ -890,6 +908,7 @@ def supprimer_recherche(recherche):
 
     return redirect(url_for("recherches_introuvables"))
 
+#lancer le serveur de dev local
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
