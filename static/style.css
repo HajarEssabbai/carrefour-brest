@@ -1149,7 +1149,7 @@ fallFlower linear infinite;
 
 left:8%;
 
-width:70px;
+width:60px;
 
 animation-duration:14s;
 animation-delay:-5s;
@@ -1159,37 +1159,37 @@ animation-delay:-5s;
 
 left:25%;
 
-width:70px;
+width:60px;
 
 animation-duration:18s;
-animation-delay:-4s;
+animation-delay:-2s;
 }
 
 .spring-flower:nth-child(3){
 
 left:50%;
 
-width:70px;
+width:60px;
 
 animation-duration:16s;
-animation-delay:-3s;
+animation-delay:0s;
 }
 
 .spring-flower:nth-child(4){
 
 left:72%;
 
-width:70px;
+width:60px;
 
 animation-duration:20s;
-animation-delay:-5s;
+animation-delay:-4s;
 }
 
 .spring-flower:nth-child(5){
 
 left:88%;
 
-width:70px;
+width:60px;
 
 animation-duration:15s;
 animation-delay:-5s;
@@ -1199,7 +1199,7 @@ animation-delay:-5s;
 
 left:17%;
 
-width:70px;
+width:60px;
 
 animation-duration:14s;
 animation-delay:-3s;
@@ -1209,7 +1209,7 @@ animation-delay:-3s;
 
 left:39%;
 
-width:70px;
+width:60px;
 
 animation-duration:18s;
 animation-delay:-3s;
@@ -1219,7 +1219,7 @@ animation-delay:-3s;
 
 left:61%;
 
-width:70px;
+width:60px;
 
 animation-duration:16s;
 animation-delay:-2s;
@@ -1229,7 +1229,7 @@ animation-delay:-2s;
 
 left:80%;
 
-width:70px;
+width:60px;
 
 animation-duration:20s;
 animation-delay:-1s;
@@ -1239,10 +1239,10 @@ animation-delay:-1s;
 
 left:93%;
 
-width:70px;
+width:60px;
 
 animation-duration:15s;
-animation-delay:-3s;
+animation-delay:-1s;
 }
 
 @keyframes fallFlower{
@@ -1254,11 +1254,11 @@ translateY(-20%)
 translateX(0px)
 rotate(0deg);
 
-opacity:0.6;
+opacity:0.4;
 }
 
 30%{
-opacity:0.6;
+opacity:0.4;
 }
 
 50%{
