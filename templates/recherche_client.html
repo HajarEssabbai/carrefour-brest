@@ -2,12 +2,7 @@
 {% block content %}
 
 <div class="page-container {{ saison }}">
-    
-    <div class="search-page"> 
-
-        <!-- 🔵 BOX RECHERCHE (SEULEMENT LE FORMULAIRE) -->
-        <div class="search-box"> 
-            {% if saison == "printemps" %}
+     {% if saison == "printemps" %}
 
     <div class="petals">
 
@@ -19,9 +14,17 @@
 
         <img src="/static/img3-removebg-preview.png" class="spring-flower">
         <img src="/static/img1-removebg-preview.png" class="spring-flower">
+        <img src="/static/img5-removebg-preview.png" class="spring-flower">
+        <img src="/static/img4-removebg-preview.png" class="spring-flower">
+        <img src="/static/img2-removebg-preview.png" class="spring-flower">
     </div>
 
     {% endif %}
+    <div class="search-page"> 
+
+        <!-- 🔵 BOX RECHERCHE (SEULEMENT LE FORMULAIRE) -->
+        <div class="search-box"> 
+        
             <div class="welcome-banner">
                 <div class="welcome-track">
                     Bienvenue dans votre magasin Carrefour Brest •
@@ -78,20 +81,6 @@
         {% if rayons %}
 
 <div class="results-box">
-{% if saison == "printemps" %}
-
-    <div class="petals">
-        <img src="/static/img2-removebg-preview.png" class="spring-flower">
-        <img src="/static/img1-removebg-preview.png" class="spring-flower">
-
-        <img src="/static/img3-removebg-preview.png" class="spring-flower">
-        <img src="/static/img1-removebg-preview.png" class="spring-flower">
-        <img src="/static/img2-removebg-preview.png" class="spring-flower">
-        <img src="/static/img5-removebg-preview.png" class="spring-flower">
-        <img src="/static/img4-removebg-preview.png" class="spring-flower">
-    </div>
-
-    {% endif %}
     {% if nb_rayons == 1 %}
     <h3 class="result-title">
         Produit trouvé dans ce rayon

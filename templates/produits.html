@@ -41,22 +41,78 @@
     </tr>
 
     {% for produit in produits %}
-    <tr>
-        <td>{{ produit[1] }}</td>
-        <td>{{ produit[2] }}</td>
+<tr>
+    <form method="POST" action="/modifier-produit/{{ produit[0] }}">
+
         <td>
-            <a href="/modifier-produit/{{ produit[0] }}">Modifier</a> |
-            <a href="/supprimer-produit/{{ produit[0] }}/{{ rayon_selectionne }}"
-               onclick="return confirm('Supprimer ce produit ?')">
-               Supprimer
+            <input
+            type="text"
+            name="nom"
+            value="{{ produit[1] }}"
+            disabled
+            id="nom{{ produit[0] }}"
+            class="inline-input"
+            required
+            >
+        </td>
+
+        <td>
+            {{ produit[2] }}
+        </td>
+
+        <td>
+            <select
+            name="rayon_id"
+            disabled
+            id="rayon{{ produit[0] }}"
+            class="inline-select"
+            >
+                {% for rayon in rayons %}
+                    <option value="{{ rayon[0] }}"
+                        {% if rayon[0] == produit[3] %}selected{% endif %}>
+                        {{ rayon[1] }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button
+            type="button"
+            onclick="activerEdition({{ produit[0] }})"
+            class="action-btn modifier-btn">
+            Modifier
+        </button>
+
+            <button
+            type="submit"
+            id="save{{ produit[0] }}"
+            class="action-btn"
+            style="display:none;">
+                Sauvegarder
+            </button>
+
+            <a
+            href="/supprimer-produit/{{ produit[0] }}/{{ rayon_selectionne }}"
+            class="action-btn supprimer-btn">
+            Supprimer
             </a>
         </td>
-    </tr>
-    {% endfor %}
+
+    </form>
+</tr>
+{% endfor %}
 
 </table>
 </div>
 </div>
 {% endif %}
 
+<script>
+function activerEdition(id){
+
+    document.getElementById("nom" + id).disabled = false;
+    document.getElementById("rayon" + id).disabled = false;
+
+    document.getElementById("save" + id).style.display = "inline-block";
+}
+</script>
 {% endblock %}

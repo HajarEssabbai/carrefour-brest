@@ -619,7 +619,7 @@ def afficher_produits():
 
     if rayon_id:
         cursor.execute("""
-            SELECT id, nom,  date_ajout 
+            SELECT id, nom,  date_ajout, rayon_id
             FROM produits 
             WHERE rayon_id = %s 
             ORDER BY LOWER(nom) ASC
@@ -762,61 +762,46 @@ def recherche():
         saison= saison
     )
 
-@app.route("/modifier-produit/<int:id>", methods=["GET", "POST"])
+@app.route("/modifier-produit/<int:id>", methods=["POST"])
 @login_required
 def modifier_produit(id):
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    if request.method == "POST":
-        nom = request.form["nom"].strip()
-        rayon_id = request.form["rayon_id"]
+    nom = request.form["nom"].strip()
+    rayon_id = request.form["rayon_id"]
 
-        # Validation nom
-        if not nom:
-            conn.close()
-            flash("Nom obligatoire ❌")
-            return redirect(url_for("modifier_produit", id=id))
-       
-
-        # Doublon (sauf lui-même)
-        cursor.execute("""
-            SELECT * FROM produits
-            WHERE LOWER(nom) = LOWER(%s) AND rayon_id = %s AND id != %s
-        """, (nom, rayon_id, id))
-
-        existe = cursor.fetchone()
-
-        if existe:
-            conn.close()
-            flash("Produit déjà existant ❌")
-            return redirect(url_for("modifier_produit", id=id))
-
-        # UPDATE
-        cursor.execute("""
-            UPDATE produits
-            SET nom = %s, rayon_id = %s
-            WHERE id = %s
-        """, (nom, rayon_id, id))
-
-        conn.commit()
+    if not nom:
         conn.close()
+        flash("Nom obligatoire ❌")
+        return redirect(url_for("afficher_produits", rayon_id=rayon_id))
 
-        flash("Produit modifié ✏️")
-        return redirect(url_for("afficher_produits"))
+    cursor.execute("""
+        SELECT * FROM produits
+        WHERE LOWER(nom) = LOWER(%s)
+        AND rayon_id = %s
+        AND id != %s
+    """, (nom, rayon_id, id))
 
-    # GET → récupérer produit
-    cursor.execute("SELECT nom,  rayon_id FROM produits WHERE id = %s", (id,))
-    produit = cursor.fetchone()
+    existe = cursor.fetchone()
 
-    # récupérer rayons
-    cursor.execute("SELECT id, nom FROM rayons")
-    rayons = cursor.fetchall()
+    if existe:
+        conn.close()
+        flash("Produit déjà existant dans ce rayon ❌")
+        return redirect(url_for("afficher_produits", rayon_id=rayon_id))
 
+    cursor.execute("""
+        UPDATE produits
+        SET nom = %s, rayon_id = %s
+        WHERE id = %s
+    """, (nom, rayon_id, id))
+
+    conn.commit()
     conn.close()
 
-    return render_template("modifier_produit.html", produit=produit, rayons=rayons, id=id)
+    flash("Produit modifié ✏️")
+    return redirect(url_for("afficher_produits", rayon_id=rayon_id))
 
 @app.route("/plan/<int:rayon_id>")
 def plan(rayon_id):

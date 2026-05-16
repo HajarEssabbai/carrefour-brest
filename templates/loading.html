@@ -15,25 +15,23 @@
 </div>
 
 <script>
-window.onload = function(){
+document.addEventListener("DOMContentLoaded", function () {
+
+    const hermine = document.getElementById("hermine");
+    const loadingPage = document.getElementById("loadingPage");
 
     setTimeout(function(){
 
-        // stop pulse + start spin
-        const hermine = document.getElementById("hermine");
         hermine.classList.add("spin");
+        loadingPage.classList.add("fade-out");
 
-        // fade out page
-        document.getElementById("loadingPage").classList.add("fade-out");
-
-        // redirection après animation
         setTimeout(function(){
             window.location.replace("{{ url_plan }}");
         }, 800);
 
     }, 2200);
 
-}
+});
 </script>
 
  {% endblock %}

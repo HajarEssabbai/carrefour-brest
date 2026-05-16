@@ -1,3 +1,13 @@
 comptes admin:
 
 admin1   mdp: 1234
+admin    mdp: admin123
+
+
+
+
+
+
+
+
+postgresql://carrefour_brest_user:hSPG02cXnekLY4kndBl9D35BrxLnG4e7@dpg-d81jepl0lvsc7392grug-a.frankfurt-postgres.render.com/carrefour_brest
