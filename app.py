@@ -663,19 +663,29 @@ def enlever_accents(texte):
 @app.route("/recherche", methods=["GET", "POST"])
 def recherche():
 
+    # Si le formulaire est envoyé
+    if request.method == "POST":
+        nom = request.form["nom"].strip().lower()
+        nom = enlever_accents(nom)
+
+        session["derniere_recherche"] = nom
+
+        return redirect(url_for("recherche"))
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
     rayons = {}
     services = {}
-    if request.method == "POST":
+    recherche_secours = False
+    recherche_effectuee = False
 
-        nom = request.form["nom"].strip().lower()
-        nom = enlever_accents(nom)
+    nom = session.get("derniere_recherche")
+
+    if nom:
 
         mots_recherche = nom.split()
-
-
+        recherche_effectuee = True
         cursor.execute("""
             SELECT p.nom, r.id, r.nom
             FROM produits p
@@ -684,29 +694,46 @@ def recherche():
 
         produits = cursor.fetchall()
 
-
-        for p in produits:
-
-            nom_db = enlever_accents(p[0].lower())
+        def ajouter_produit_au_rayon(p):
             rayon_id = p[1]
             rayon_nom = p[2]
-            if all(mot.rstrip("s") in nom_db for mot in mots_recherche):
-                if rayon_id not in rayons:
-                    rayons[rayon_id] = {
-                         "nom": rayon_nom,
-                         "produits": []
-                           }
 
-                if p[0] not in rayons[rayon_id]["produits"]:
-                    rayons[rayon_id]["produits"].append(p[0])
+            if rayon_id not in rayons:
+                rayons[rayon_id] = {
+                    "nom": rayon_nom,
+                    "produits": []
+                }
+
+            if p[0] not in rayons[rayon_id]["produits"]:
+                rayons[rayon_id]["produits"].append(p[0])
+
+        # Recherche stricte
+        for p in produits:
+            nom_db = enlever_accents(p[0].lower())
+
+            if all(mot.rstrip("s") in nom_db for mot in mots_recherche):
+                ajouter_produit_au_rayon(p)
+
+        # Recherche de secours
+        if not rayons and len(mots_recherche) > 1:
+            mot_principal = mots_recherche[0].rstrip("s")
+            recherche_secours = True
+
+            for p in produits:
+                nom_db = enlever_accents(p[0].lower())
+
+                if mot_principal in nom_db:
+                    ajouter_produit_au_rayon(p)
 
         cursor.execute("""
-                       SELECT s.id, s.nom, r.id, r.nom, a.alias
-                       FROM services s
-                       JOIN rayons r ON s.rayon_id = r.id
-                       LEFT JOIN service_alias a ON s.id = a.service_id
-                       """)
+            SELECT s.id, s.nom, r.id, r.nom, a.alias
+            FROM services s
+            JOIN rayons r ON s.rayon_id = r.id
+            LEFT JOIN service_alias a ON s.id = a.service_id
+        """)
+
         services_db = cursor.fetchall()
+
         for s in services_db:
             service_id = s[0]
             service_nom = s[1]
@@ -719,19 +746,18 @@ def recherche():
             if all(mot.rstrip("s") in texte for mot in mots_recherche):
                 if service_id not in services:
                     services[service_id] = {
-                    "nom": service_nom,
-                    "rayon_id": rayon_id,
-                    "rayon_nom": rayon_nom
-            }
-                    
+                        "nom": service_nom,
+                        "rayon_id": rayon_id,
+                        "rayon_nom": rayon_nom
+                    }
 
-    if not rayons and not services and request.method == "POST":
-        cursor.execute("""
-                       INSERT INTO recherches_introuvables
-                       (recherche, date_recherche)
-                       VALUES (%s, NOW())
-                       """, (nom,))
-        conn.commit()   
+        if not rayons and not services:
+            cursor.execute("""
+                INSERT INTO recherches_introuvables
+                (recherche, date_recherche)
+                VALUES (%s, NOW())
+            """, (nom,))
+            conn.commit()
 
     conn.close()
 
@@ -739,7 +765,6 @@ def recherche():
         template = "recherche_admin.html"
     else:
         template = "recherche_client.html"
-
 
     from datetime import datetime
 
@@ -759,7 +784,9 @@ def recherche():
         rayons=rayons,
         services=services,
         nb_rayons=len(rayons),
-        saison= saison
+        saison=saison,
+        recherche_secours=recherche_secours,
+        recherche_effectuee=recherche_effectuee
     )
 
 @app.route("/modifier-produit/<int:id>", methods=["POST"])

@@ -22,7 +22,7 @@
     {% endif %}
     <div class="search-page"> 
 
-        <!-- 🔵 BOX RECHERCHE (SEULEMENT LE FORMULAIRE) -->
+        <!--  BOX RECHERCHE (SEULEMENT LE FORMULAIRE) -->
         <div class="search-box"> 
         
             <div class="welcome-banner">
@@ -78,9 +78,46 @@
 
 
         <!-- 🔴 RESULTATS (EN DEHORS DE LA BOX) -->
+         {% if services %}
+
+<div class="results-box">
+
+    <h3 class="result-title">
+        Service trouvé
+    </h3>
+
+    {% for service_id, service in services.items() %}
+
+    <div class="rayon-card">
+
+        <h2 class="rayon-title">
+            {{ service["nom"] }}
+        </h2>
+
+        <a
+        class="rayon-btn"
+        href="/loading/{{ service["rayon_id"] }}">
+        Localiser ce service
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
         {% if rayons %}
 
 <div class="results-box">
+
+    {% if recherche_secours %}
+    <p class="result-subtitle">
+        Aucun résultat exact trouvé, voici des résultats proches :
+    </p>
+    {% endif %}
+    
     {% if nb_rayons == 1 %}
     <h3 class="result-title">
         Produit trouvé dans ce rayon
@@ -135,37 +172,9 @@
 
 {% endif %}
 
-        {% if services %}
+        
 
-<div class="results-box">
-
-    <h3 class="result-title">
-        Service trouvé
-    </h3>
-
-    {% for service_id, service in services.items() %}
-
-    <div class="rayon-card">
-
-        <h2 class="rayon-title">
-            {{ service["nom"] }}
-        </h2>
-
-        <a
-        class="rayon-btn"
-        href="/loading/{{ service["rayon_id"] }}">
-        Localiser ce service
-        </a>
-
-    </div>
-
-    {% endfor %}
-
-</div>
-
-{% endif %}
-
-{% if not rayons and not services and request.method == "POST" %}
+{% if recherche_effectuee and not rayons and not services %}
 
 <p class="not-found">
     Produit ou service introuvable ❌
