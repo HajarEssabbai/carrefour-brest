@@ -1067,7 +1067,7 @@ padding:12px;
 }
 
 .search-box{
-padding:60px 15px;
+padding:40px 15px;
 overflow:hidden;
 position:relative;
 
@@ -1101,7 +1101,7 @@ font-size:30px;
 }
 
 .brest-label{
-top:180px;
+top:115px;
 right:25px;
 font-size:30px;
 
@@ -1110,7 +1110,7 @@ font-size:30px;
 @media (max-width:700px){
 
 .welcome-track{
-font-size:20px;
+font-size:23px;
 }
 
 }
