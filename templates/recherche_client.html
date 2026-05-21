@@ -175,9 +175,13 @@
 
 {% if recherche_effectuee and not rayons and not services %}
 
-<p class="not-found">
-    Produit ou service introuvable ❌
-</p>
+<div class="not-found">
+    <p>Produit ou service introuvable ❌</p>
+    
+    <p class="not-found-info">
+        Nous prenons en compte les recherches introuvables afin de mieux répondre à vos besoins.
+    </p>
+</div>
 
 {% endif %}
 
