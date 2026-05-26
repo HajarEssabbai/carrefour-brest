@@ -682,6 +682,7 @@ def recherche():
         nom = enlever_accents(nom)
 
         session["derniere_recherche"] = nom
+        session["log_recherche"] = True
 
         return redirect(url_for("recherche"))
 
@@ -764,13 +765,15 @@ def recherche():
                         "rayon_nom": rayon_nom
                     }
 
-            if recherche_secours or (not rayons and not services):
-                cursor.execute("""
-                               INSERT INTO recherches_introuvables
-                               (recherche, date_recherche)
-                               VALUES (%s, NOW())
-                               """, (nom,))
-                conn.commit()
+        if (recherche_secours or (not rayons and not services)) and session.get("log_recherche"):
+            cursor.execute("""
+                           INSERT INTO recherches_introuvables
+                           (recherche, date_recherche)
+                           VALUES (%s, NOW())
+                           """, (nom,))
+            conn.commit()
+
+            session["log_recherche"] = False
 
     conn.close()
 
