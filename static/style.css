@@ -981,6 +981,11 @@ animation:defilement 15s linear infinite;
     text-decoration:underline;
 }
 
+.qr-card{
+font-weight:bold;
+}
+
+
 @keyframes defilement{
 from{
 transform:translateX(35%);

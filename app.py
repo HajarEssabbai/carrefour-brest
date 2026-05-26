@@ -348,7 +348,20 @@ def migrate_recherches():
 @app.route("/")
 @login_required
 def accueil():
-    return render_template("accueil.html")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nb_scans
+        FROM statistiques_qr
+        WHERE id = 1
+    """)
+
+    nb_scans = cursor.fetchone()[0]
+
+    cursor.close()
+    conn.close()
+    return render_template("accueil.html", nb_scans=nb_scans)
 
 
 @app.route("/login", methods=["GET","POST"])
@@ -538,7 +551,7 @@ def ajouter_produit():
     cursor = conn.cursor()
 
     if request.method == "POST":
-        nom = request.form["nom"].strip()
+        nom = request.form["nom"].strip().upper()
         rayon_id = request.form["rayon_id"]
 
         # Validation nom
@@ -751,13 +764,13 @@ def recherche():
                         "rayon_nom": rayon_nom
                     }
 
-        if not rayons and not services:
-            cursor.execute("""
-                INSERT INTO recherches_introuvables
-                (recherche, date_recherche)
-                VALUES (%s, NOW())
-            """, (nom,))
-            conn.commit()
+            if recherche_secours or (not rayons and not services):
+                cursor.execute("""
+                               INSERT INTO recherches_introuvables
+                               (recherche, date_recherche)
+                               VALUES (%s, NOW())
+                               """, (nom,))
+                conn.commit()
 
     conn.close()
 
@@ -919,6 +932,23 @@ def supprimer_recherche(recherche):
     flash("Recherche supprimée 🗑️")
 
     return redirect(url_for("recherches_introuvables"))
+
+@app.route('/scan')
+def scan_qr():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE statistiques_qr
+        SET nb_scans = nb_scans + 1
+        WHERE id = 1
+    """)
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('recherche'))
 
 #lancer le serveur de dev local
 if __name__ == "__main__":
