@@ -902,9 +902,10 @@ def recherches_introuvables():
                    TO_CHAR(
                    MAX(date_recherche::timestamp),
                    'YYYY-MM-DD HH24:MI:SS'
-                   )
+                   ), produit_reference
                    FROM recherches_introuvables
-                   GROUP BY recherche
+                   WHERE produit_reference = 1
+                   GROUP BY recherche, produit_reference
                    ORDER BY total DESC
                    """)
     
@@ -935,6 +936,85 @@ def supprimer_recherche(recherche):
     flash("Recherche supprimée 🗑️")
 
     return redirect(url_for("recherches_introuvables"))
+
+@app.route("/non-referencer/<int:id>")
+@login_required
+def non_referencer(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE recherches_introuvables
+        SET produit_reference = 0
+        WHERE recherche = (
+            SELECT recherche
+            FROM recherches_introuvables
+            WHERE id=%s
+        )
+    """, (id,))
+
+    conn.commit()
+    conn.close()
+
+    flash("Produit marqué comme non référencé ✅")
+
+    return redirect(url_for("recherches_introuvables"))
+
+@app.route("/recherches-non-referencees")
+@login_required
+def recherches_non_referencees():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            MIN(id),
+            recherche,
+            COUNT(*) as total,
+            TO_CHAR(MAX(date_recherche::timestamp), 'YYYY-MM-DD HH24:MI:SS'),
+            produit_reference
+        FROM recherches_introuvables
+        WHERE produit_reference = 0
+        GROUP BY recherche, produit_reference
+        ORDER BY total DESC
+    """)
+
+    recherches = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "recherches_non_referencees.html",
+        recherches=recherches
+    )
+
+@app.route("/referencer/<int:id>")
+@login_required
+def referencer(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE recherches_introuvables
+        SET produit_reference = 1
+        WHERE recherche = (
+            SELECT recherche
+            FROM recherches_introuvables
+            WHERE id=%s
+        )
+    """, (id,))
+
+    conn.commit()
+    conn.close()
+
+    flash("Produit remis en référencé ✅")
+
+    return redirect(url_for("recherches_non_referencees"))
+
+
 
 @app.route('/scan')
 def scan_qr():

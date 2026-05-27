@@ -6,7 +6,7 @@
 
     <div class="admin-header">
         <h2>
-            📊 Recherches non trouvées
+            🚫 Produits non référencés
         </h2>
     </div>
 
@@ -61,24 +61,8 @@
 
                     <td>
 
-                        <a
-                        href="/ajouter-produit?nom={{ recherche[1] }}"
-                        class="action-btn">
-                            Ajouter
-                        </a>
-
-                        <a
-                        href="/supprimer-recherche/{{ recherche[1] }}"
-                        onclick="return confirm('Supprimer cette recherche ?')"
-                        class="action-btn">
-                        Supprimer
-                        </a>
-
-                        <a
-                        href="/non-referencer/{{ recherche[0] }}"
-                        onclick="return confirm('Marquer comme non référencé ?')"
-                        class="action-btn">
-                        Non référencer
+                        <a href="/referencer/{{ recherche[0] }}" class="action-btn">
+                            Remettre en référencé
                         </a>
                         
                     </td>
