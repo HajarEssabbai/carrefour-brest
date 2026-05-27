@@ -475,7 +475,7 @@ def afficher_rayons():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, nom, numero_allee FROM rayons")
+    cursor.execute("SELECT id, nom, numero_allee FROM rayons ORDER BY nom ASC")
     rayons = cursor.fetchall()
 
     conn.close()
@@ -614,7 +614,7 @@ def afficher_produits():
     cursor = conn.cursor()
 
     # récupérer tous les rayons (pour dropdown)
-    cursor.execute("SELECT id, nom FROM rayons")
+    cursor.execute("SELECT id, nom FROM rayons ORDER BY nom ASC")
     rayons = cursor.fetchall()
 
     produits = []
