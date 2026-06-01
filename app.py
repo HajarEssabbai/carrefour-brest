@@ -468,6 +468,8 @@ def ajouter_rayon():
 
 
 
+
+
 @app.route("/rayons")
 @login_required
 def afficher_rayons():
@@ -1018,6 +1020,14 @@ def referencer(id):
 
 @app.route('/scan')
 def scan_qr():
+    session["scan_qr_a_compter"] = True
+    return redirect(url_for('recherche'))
+
+@app.route('/increment-scan', methods=["POST"])
+def increment_scan():
+
+    if not session.get("scan_qr_a_compter"):
+        return {"status": "ignored"}
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1029,9 +1039,12 @@ def scan_qr():
     """)
 
     conn.commit()
+    cursor.close()
     conn.close()
 
-    return redirect(url_for('recherche'))
+    session["scan_qr_a_compter"] = False
+
+    return {"status": "ok"}
 
 #lancer le serveur de dev local
 if __name__ == "__main__":
