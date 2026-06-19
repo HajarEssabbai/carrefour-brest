@@ -812,34 +812,27 @@ def recherche():
 
 @app.route("/suggestions")
 def suggestions():
-    q = request.args.get("q", "").strip().lower()
-    q = enlever_accents(q)
+
+    q = request.args.get("q", "").strip()
+
+    if len(q) < 2:
+        return {"suggestions": []}
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT nom FROM produits
-        UNION
-        SELECT nom FROM services
-        UNION
-        SELECT alias FROM service_alias
-    """)
+        SELECT nom
+        FROM produits
+        WHERE nom ILIKE %s
+        LIMIT 5
+    """, (f"%{q}%",))
 
-    resultats = []
-
-    for row in cursor.fetchall():
-        nom = row[0]
-
-        if nom:
-            nom_normalise = enlever_accents(nom.lower())
-
-            if q in nom_normalise:
-                resultats.append(nom)
+    suggestions = [row[0] for row in cursor.fetchall()]
 
     conn.close()
 
-    return {"suggestions": resultats[:8]}
+    return {"suggestions": suggestions}
 
 @app.route("/modifier-produit/<int:id>", methods=["POST"])
 @login_required
