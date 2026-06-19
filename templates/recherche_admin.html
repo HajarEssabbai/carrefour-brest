@@ -54,13 +54,13 @@
                     <input
                     type="text"
                     name="nom"
-                    id="search-input"
+                    id="search-input-client"
                     placeholder="Trouvez un produit (Pain, œufs, lait...)"
                     autocomplete="off"
                     required
                     >
 
-                    <div id="suggestions-box" class="suggestions-box"></div>
+                    <div id="suggestions-box-client" class="suggestions-box"></div>
 
                     <img
                     src="{{ url_for('static',
@@ -202,65 +202,58 @@ fetch("/increment-scan", {
 </script>
 
 <script>
-const input = document.getElementById("search-input");
-const suggestionsBox = document.getElementById("suggestions-box");
+const inputClient = document.getElementById("search-input-client");
+const boxClient = document.getElementById("suggestions-box-client");
 
-let controller = null;
-let lastQuery = "";
+let toutesSuggestions = [];
 
-input.addEventListener("input", function () {
-    const query = input.value.trim();
-    lastQuery = query;
+fetch("/suggestions-client")
+    .then(response => response.json())
+    .then(data => {
+        toutesSuggestions = data.suggestions;
+    });
 
-    if (controller) {
-        controller.abort();
-    }
+function normaliserTexte(texte) {
+    return texte
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
 
-    if (query.length < 2) {
-        suggestionsBox.innerHTML = "";
-        suggestionsBox.style.display = "none";
+inputClient.addEventListener("input", function () {
+    const valeur = normaliserTexte(inputClient.value.trim());
+
+    boxClient.innerHTML = "";
+
+    if (valeur.length < 2) {
+        boxClient.style.display = "none";
         return;
     }
 
-    controller = new AbortController();
+    const resultats = toutesSuggestions
+        .filter(s => normaliserTexte(s).includes(valeur))
+        .slice(0, 5);
 
-    fetch(`/suggestions?q=${encodeURIComponent(query)}`, {
-        signal: controller.signal
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (query !== lastQuery) return;
+    if (resultats.length === 0) {
+        boxClient.style.display = "none";
+        return;
+    }
 
-        suggestionsBox.innerHTML = "";
+    resultats.forEach(suggestion => {
+        const div = document.createElement("div");
+        div.className = "suggestion-item";
+        div.textContent = suggestion;
 
-        const suggestions = data.suggestions.slice(0, 4);
-
-        if (suggestions.length === 0) {
-            suggestionsBox.style.display = "none";
-            return;
-        }
-
-        suggestions.forEach(suggestion => {
-            const div = document.createElement("div");
-            div.classList.add("suggestion-item");
-            div.textContent = suggestion;
-
-            div.addEventListener("click", function () {
-                input.value = suggestion;
-                suggestionsBox.innerHTML = "";
-                suggestionsBox.style.display = "none";
-            });
-
-            suggestionsBox.appendChild(div);
+        div.addEventListener("click", function () {
+            inputClient.value = suggestion;
+            boxClient.innerHTML = "";
+            boxClient.style.display = "none";
         });
 
-        suggestionsBox.style.display = "block";
-    })
-    .catch(error => {
-        if (error.name !== "AbortError") {
-            console.error(error);
-        }
+        boxClient.appendChild(div);
     });
+
+    boxClient.style.display = "block";
 });
 </script>
 

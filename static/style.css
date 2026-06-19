@@ -1289,9 +1289,7 @@ opacity:0;
 
 }
 
-.search-form {
-    position: relative;
-}
+
 
 .search-row {
     position: relative;
@@ -1304,9 +1302,8 @@ opacity:0;
     top: calc(100% + 6px);
     left: 0;
     width: 82%;
-
-    max-height: 115px;   /* plus petit */
-    overflow-y: auto;    /* scroll si trop de résultats */
+    max-height: 140px;
+    overflow-y: auto;
 
     background: white;
     border-radius: 14px;
@@ -1316,15 +1313,10 @@ opacity:0;
 
 .suggestion-item {
     padding: 11px 14px;
-    text-align: left;
     font-size: 14px;
     color: #222;
     cursor: pointer;
     border-bottom: 1px solid #eee;
-}
-
-.suggestion-item:last-child {
-    border-bottom: none;
 }
 
 .suggestion-item:hover {

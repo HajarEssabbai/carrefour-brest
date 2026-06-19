@@ -810,25 +810,20 @@ def recherche():
         recherche_effectuee=recherche_effectuee,
     )
 
-@app.route("/suggestions")
-def suggestions():
-
-    q = request.args.get("q", "").strip()
-
-    if len(q) < 2:
-        return {"suggestions": []}
-
+@app.route("/suggestions-client")
+def suggestions_client():
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT nom
-        FROM produits
-        WHERE nom ILIKE %s
-        LIMIT 5
-    """, (f"%{q}%",))
+        SELECT nom FROM produits
+        UNION
+        SELECT nom FROM services
+        UNION
+        SELECT alias FROM service_alias
+    """)
 
-    suggestions = [row[0] for row in cursor.fetchall()]
+    suggestions = [row[0] for row in cursor.fetchall() if row[0]]
 
     conn.close()
 
