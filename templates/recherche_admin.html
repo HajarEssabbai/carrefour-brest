@@ -54,16 +54,13 @@
                     <input
                     type="text"
                     name="nom"
-                    list="suggestions-produits"
+                    id="search-input"
                     placeholder="Trouvez un produit (Pain, œufs, lait...)"
+                    autocomplete="off"
                     required
                     >
-                    
-                    <datalist id="suggestions-produits">
-                        {% for suggestion in suggestions %}
-                            <option value="{{ suggestion }}">
-                        {% endfor %}
-                    </datalist>
+
+                    <div id="suggestions-box" class="suggestions-box"></div>
 
                     <img
                     src="{{ url_for('static',
@@ -201,6 +198,48 @@
 <script>
 fetch("/increment-scan", {
     method: "POST"
+});
+</script>
+
+<script>
+const input = document.getElementById("search-input");
+const suggestionsBox = document.getElementById("suggestions-box");
+
+input.addEventListener("input", function () {
+    const query = input.value.trim();
+
+    if (query.length < 2) {
+        suggestionsBox.innerHTML = "";
+        suggestionsBox.style.display = "none";
+        return;
+    }
+
+    fetch(`/suggestions?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            suggestionsBox.innerHTML = "";
+
+            if (data.suggestions.length === 0) {
+                suggestionsBox.style.display = "none";
+                return;
+            }
+
+            data.suggestions.slice(0, 10).forEach(suggestion => {
+                const div = document.createElement("div");
+                div.classList.add("suggestion-item");
+                div.textContent = suggestion;
+
+                div.addEventListener("click", function () {
+                    input.value = suggestion;
+                    suggestionsBox.innerHTML = "";
+                    suggestionsBox.style.display = "none";
+                });
+
+                suggestionsBox.appendChild(div);
+            });
+
+            suggestionsBox.style.display = "block";
+        });
 });
 </script>
 

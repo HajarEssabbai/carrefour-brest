@@ -1289,5 +1289,44 @@ opacity:0;
 
 }
 
+.search-form {
+    position: relative;
+}
 
+.search-row {
+    position: relative;
+    z-index: 100;
+}
 
+.suggestions-box {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 82%;
+
+    max-height: 115px;   /* plus petit */
+    overflow-y: auto;    /* scroll si trop de résultats */
+
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+    z-index: 999999;
+}
+
+.suggestion-item {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 14px;
+    color: #222;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #eef5ff;
+}

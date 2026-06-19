@@ -779,17 +779,6 @@ def recherche():
 
         cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT nom FROM produits
-        UNION
-        SELECT nom FROM services
-        UNION
-        SELECT alias FROM service_alias
-        ORDER BY nom
-    """)
-
-    suggestions = [row[0] for row in cursor.fetchall() if row[0]]
-
     conn.close()
 
     if "admin" in session:
@@ -819,8 +808,38 @@ def recherche():
         saison=saison,
         recherche_secours=recherche_secours,
         recherche_effectuee=recherche_effectuee,
-        suggestions=suggestions
     )
+
+@app.route("/suggestions")
+def suggestions():
+    q = request.args.get("q", "").strip().lower()
+    q = enlever_accents(q)
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nom FROM produits
+        UNION
+        SELECT nom FROM services
+        UNION
+        SELECT alias FROM service_alias
+    """)
+
+    resultats = []
+
+    for row in cursor.fetchall():
+        nom = row[0]
+
+        if nom:
+            nom_normalise = enlever_accents(nom.lower())
+
+            if q in nom_normalise:
+                resultats.append(nom)
+
+    conn.close()
+
+    return {"suggestions": resultats[:8]}
 
 @app.route("/modifier-produit/<int:id>", methods=["POST"])
 @login_required
