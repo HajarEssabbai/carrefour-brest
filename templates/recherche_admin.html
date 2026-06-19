@@ -205,8 +205,16 @@ fetch("/increment-scan", {
 const input = document.getElementById("search-input");
 const suggestionsBox = document.getElementById("suggestions-box");
 
+let controller = null;
+let lastQuery = "";
+
 input.addEventListener("input", function () {
     const query = input.value.trim();
+    lastQuery = query;
+
+    if (controller) {
+        controller.abort();
+    }
 
     if (query.length < 2) {
         suggestionsBox.innerHTML = "";
@@ -214,32 +222,45 @@ input.addEventListener("input", function () {
         return;
     }
 
-    fetch(`/suggestions?q=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-            suggestionsBox.innerHTML = "";
+    controller = new AbortController();
 
-            if (data.suggestions.length === 0) {
+    fetch(`/suggestions?q=${encodeURIComponent(query)}`, {
+        signal: controller.signal
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (query !== lastQuery) return;
+
+        suggestionsBox.innerHTML = "";
+
+        const suggestions = data.suggestions.slice(0, 4);
+
+        if (suggestions.length === 0) {
+            suggestionsBox.style.display = "none";
+            return;
+        }
+
+        suggestions.forEach(suggestion => {
+            const div = document.createElement("div");
+            div.classList.add("suggestion-item");
+            div.textContent = suggestion;
+
+            div.addEventListener("click", function () {
+                input.value = suggestion;
+                suggestionsBox.innerHTML = "";
                 suggestionsBox.style.display = "none";
-                return;
-            }
-
-            data.suggestions.slice(0, 10).forEach(suggestion => {
-                const div = document.createElement("div");
-                div.classList.add("suggestion-item");
-                div.textContent = suggestion;
-
-                div.addEventListener("click", function () {
-                    input.value = suggestion;
-                    suggestionsBox.innerHTML = "";
-                    suggestionsBox.style.display = "none";
-                });
-
-                suggestionsBox.appendChild(div);
             });
 
-            suggestionsBox.style.display = "block";
+            suggestionsBox.appendChild(div);
         });
+
+        suggestionsBox.style.display = "block";
+    })
+    .catch(error => {
+        if (error.name !== "AbortError") {
+            console.error(error);
+        }
+    });
 });
 </script>
 
