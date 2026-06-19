@@ -777,6 +777,19 @@ def recherche():
 
             session["log_recherche"] = False
 
+        cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nom FROM produits
+        UNION
+        SELECT nom FROM services
+        UNION
+        SELECT alias FROM service_alias
+        ORDER BY nom
+    """)
+
+    suggestions = [row[0] for row in cursor.fetchall() if row[0]]
+
     conn.close()
 
     if "admin" in session:
@@ -797,6 +810,7 @@ def recherche():
     else:
         saison = "automne"
 
+    
     return render_template(
         template,
         rayons=rayons,
@@ -804,7 +818,8 @@ def recherche():
         nb_rayons=len(rayons),
         saison=saison,
         recherche_secours=recherche_secours,
-        recherche_effectuee=recherche_effectuee
+        recherche_effectuee=recherche_effectuee,
+        suggestions=suggestions
     )
 
 @app.route("/modifier-produit/<int:id>", methods=["POST"])

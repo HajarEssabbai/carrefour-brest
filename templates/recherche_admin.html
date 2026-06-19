@@ -54,9 +54,16 @@
                     <input
                     type="text"
                     name="nom"
-                    placeholder="Touvrez un produit (Pain, œufs, lait...)""
+                    list="suggestions-produits"
+                    placeholder="Trouvez un produit (Pain, œufs, lait...)"
                     required
                     >
+                    
+                    <datalist id="suggestions-produits">
+                        {% for suggestion in suggestions %}
+                            <option value="{{ suggestion }}">
+                        {% endfor %}
+                    </datalist>
 
                     <img
                     src="{{ url_for('static',
