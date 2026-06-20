@@ -242,7 +242,10 @@ inputClient.addEventListener("input", function () {
     resultats.forEach(suggestion => {
         const div = document.createElement("div");
         div.className = "suggestion-item";
-        div.textContent = suggestion;
+        div.innerHTML = `
+        <span class="search-icon">🔍</span>
+        <span>${suggestion}</span>
+        `;
 
         div.addEventListener("click", function () {
             inputClient.value = suggestion;
