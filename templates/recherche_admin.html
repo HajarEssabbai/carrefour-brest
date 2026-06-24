@@ -231,8 +231,7 @@ inputClient.addEventListener("input", function () {
     }
 
     const resultats = toutesSuggestions
-        .filter(s => normaliserTexte(s).includes(valeur))
-        .slice(0, 5);
+        .filter(s => normaliserTexte(s).includes(valeur));
 
     if (resultats.length === 0) {
         boxClient.style.display = "none";
