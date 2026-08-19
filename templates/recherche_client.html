@@ -56,9 +56,13 @@
                     <input
                     type="text"
                     name="nom"
+                    id="search-input-client"
                     placeholder="Trouvez un produit (Pain, œufs, lait...)"
+                    autocomplete="off"
                     required
                     >
+
+                    <div id="suggestions-box-client" class="suggestions-box"></div>
 
                     <img
                     src="{{ url_for('static',
@@ -198,6 +202,65 @@
 <script>
 fetch("/increment-scan", {
     method: "POST"
+});
+</script>
+
+
+<script>
+const inputClient = document.getElementById("search-input-client");
+const boxClient = document.getElementById("suggestions-box-client");
+
+let toutesSuggestions = [];
+
+fetch("/suggestions-client")
+    .then(response => response.json())
+    .then(data => {
+        toutesSuggestions = data.suggestions;
+    });
+
+function normaliserTexte(texte) {
+    return texte
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+inputClient.addEventListener("input", function () {
+    const valeur = normaliserTexte(inputClient.value.trim());
+
+    boxClient.innerHTML = "";
+
+    if (valeur.length < 2) {
+        boxClient.style.display = "none";
+        return;
+    }
+
+    const resultats = toutesSuggestions
+        .filter(s => normaliserTexte(s).includes(valeur));
+
+    if (resultats.length === 0) {
+        boxClient.style.display = "none";
+        return;
+    }
+
+    resultats.forEach(suggestion => {
+        const div = document.createElement("div");
+        div.className = "suggestion-item";
+        div.innerHTML = `
+        <span class="search-icon">🔍</span>
+        <span>${suggestion}</span>
+        `;
+
+        div.addEventListener("click", function () {
+            inputClient.value = suggestion;
+            boxClient.innerHTML = "";
+            boxClient.style.display = "none";
+        });
+
+        boxClient.appendChild(div);
+    });
+
+    boxClient.style.display = "block";
 });
 </script>
 
